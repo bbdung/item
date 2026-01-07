@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Items</title>
+</head>
+<body>
+<h2>Items (Hello {{ user }})</h2>
+
+<form id="addForm">
+    <label>
+        <input name="name" placeholder="New item">
+    </label>
+    <button>Add</button>
+</form>
+
+<ul id="items">
+    {% for id, name in items %}
+    <li data-id="{{ id }}">{{ name }}</li>
+    {% endfor %}
+</ul>
+
+<script>
+    document.getElementById("addForm").addEventListener("submit", async (e) => {
+      e.preventDefault()
+
+      const formData = new FormData(e.target)
+
+      const res = await fetch("/items", {
+        method: "POST",
+        body: formData
+      })
+
+      if (!res.ok) return
+
+      const item = await res.json()
+
+
+      const li = document.createElement("li")
+      li.textContent = item.name
+      li.dataset.id = item.id
+
+      const ul = document.getElementById("items")
+      ul.prepend(li)
+
+      e.target.reset()
+    })
+</script>
+</body>
+</html>
