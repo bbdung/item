@@ -1,25 +1,17 @@
-from fastapi import APIRouter, Form, Request, Depends, HTTPException
+from fastapi import APIRouter, Form, Depends, HTTPException
 from sqlalchemy.orm import Session
-from starlette.responses import HTMLResponse, RedirectResponse
-from starlette.templating import Jinja2Templates
+from starlette.responses import RedirectResponse
 
-from db.session import get_db
-from security.security import create_token
+from core.security import create_token
+from dependencies import get_db
 from models.user import User
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 
-@router.get("/", response_class=HTMLResponse)
-def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
-
-
-@router.post("/")
-def login(username: str = Form(...),
-          password: str = Form(...),
-          db: Session = Depends(get_db)):
+def authenticate_user(username: str = Form(...),
+                      password: str = Form(...),
+                      db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == username).first()
     if not user or user.password != password:
         raise HTTPException(401, "Invalid credentials")

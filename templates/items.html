@@ -37,7 +37,7 @@
 
 
       const li = document.createElement("li")
-      li.textContent = item.name
+      li.textContent = `${item.id} - ${item.name}`
       li.dataset.id = item.id
 
       const ul = document.getElementById("items")
