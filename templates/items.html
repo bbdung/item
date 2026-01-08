@@ -15,8 +15,8 @@
 </form>
 
 <ul id="items">
-    {% for id, name in items %}
-    <li data-id="{{ id }}">{{ name }}</li>
+    {% for item in items %}
+    <li>{{ item.id }} -  {{item.name}}</li>
     {% endfor %}
 </ul>
 
