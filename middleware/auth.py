@@ -1,7 +1,6 @@
 from fastapi import Request, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import RedirectResponse
-from jose import JWTError
 
 from security.jwt import get_current_user
 
@@ -9,14 +8,17 @@ from security.jwt import get_current_user
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
 
-        if request.url.path.startswith("/login"):
+        if (
+                request.url.path.startswith("/login")
+                or request.url.path.startswith("/static")
+        ):
             return await call_next(request)
 
         try:
-            get_current_user(request)  # chỉ để validate token
-        except JWTError:
-            return RedirectResponse("/login")
+            user = get_current_user(request)
+            request.state.user = user
+
         except HTTPException:
-            return RedirectResponse("/login")
+            return RedirectResponse("/login", status_code=302)
 
         return await call_next(request)
